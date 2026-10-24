@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: uk-wind-forecast-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    healthCheckPath: /api/health
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://YOUR-APP.vercel.app
+      - key: DECISION_HOUR
+        value: "9"
+      - key: DECISION_MINUTE
+        value: "0"

@@ -1,11 +1,5 @@
-/* ==========================================================================
-   UK Wind Forecast Dashboard – Production CSS
-   File: frontend/src/styles/index.css
-   ========================================================================== */
-
 @layer reset, tokens, base, layout, components, charts, states, utilities, print;
 
-/* ---------- 1. RESET ---------- */
 @layer reset {
   *, *::before, *::after { box-sizing: border-box; }
   * { margin: 0; }
@@ -15,12 +9,10 @@
   img, svg { display: block; max-inline-size: 100%; }
 }
 
-/* ---------- 2. DESIGN TOKENS ---------- */
 @layer tokens {
   :root {
     color-scheme: light dark;
 
-    /* brand colours */
     --c-actual: #0b7285;
     --c-forecast: #e8590c;
     --c-accent: #3b82f6;
@@ -29,7 +21,6 @@
     --c-purple: #9333ea;
     --c-danger: #dc2626;
 
-    /* light theme surfaces */
     --bg: #f8fafc;
     --bg-mesh-1: #e0e7ff;
     --bg-mesh-2: #cffafe;
@@ -46,26 +37,21 @@
     --grid: #e2e8f0;
     --ring: color-mix(in srgb, var(--c-accent) 45%, transparent);
 
-    /* spacing scale */
     --s-1: 0.25rem; --s-2: 0.5rem; --s-3: 0.75rem; --s-4: 1rem;
     --s-5: 1.25rem; --s-6: 1.75rem; --s-7: 2.5rem; --s-8: 3.5rem;
 
-    /* radius */
     --r-xs: 4px; --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-full: 9999px;
 
-    /* layered shadows */
     --shadow-1: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
     --shadow-2: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
     --shadow-3: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
 
-    /* type scale (fluid) */
     --fs-h1: clamp(1.5rem, 1.1rem + 1.8vw, 2.25rem);
     --fs-body: clamp(0.925rem, 0.88rem + 0.18vw, 1rem);
     --fs-small: 0.82rem;
     --fs-xs: 0.72rem;
     --fs-metric: clamp(1.35rem, 1.05rem + 1.2vw, 1.95rem);
 
-    /* motion */
     --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
     --t-fast: 150ms;
@@ -106,7 +92,6 @@
   }
 }
 
-/* ---------- 3. BASE ---------- */
 @layer base {
   body {
     font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
@@ -135,7 +120,6 @@
   ::selection { background: color-mix(in srgb, var(--c-accent) 30%, transparent); }
 }
 
-/* ---------- 4. LAYOUT ---------- */
 @layer layout {
   .wrap {
     inline-size: min(100% - 2rem, 1140px);
@@ -145,7 +129,6 @@
     gap: var(--s-4);
   }
 
-  /* Brand Header Badge */
   .brand-header {
     display: grid;
     gap: var(--s-2);
@@ -165,21 +148,6 @@
     background: color-mix(in srgb, var(--c-accent) 12%, transparent);
     border: 1px solid color-mix(in srgb, var(--c-accent) 30%, transparent);
     border-radius: var(--r-full);
-  }
-
-  /* Table Section Controls */
-  .table-section {
-    display: grid;
-    gap: var(--s-2);
-    margin-top: var(--s-2);
-  }
-
-  .table-header-controls {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--s-2);
   }
 
   .sub {
@@ -204,7 +172,6 @@
     border-radius: var(--r-sm);
   }
 
-  /* ═══ CLEAN, PRECISE DATE SELECTOR TOOLBAR ═══ */
   .selector {
     position: relative;
     display: flex;
@@ -305,20 +272,28 @@
     }
   }
 
-  /* ═══ METRIC CARDS GRID ═══ */
   .cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr));
     gap: var(--s-3);
   }
+
+  .table-section {
+    display: grid;
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+  }
+
+  .table-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
 }
 
-/* ---------- 5. COMPONENTS ---------- */
 @layer components {
-
-  /* ═══════════════════════════
-     METRIC CARDS — SOLID, CLEAN & RESPONSIVE
-     ═══════════════════════════ */
   .card {
     --accent: var(--c-accent);
     position: relative;
@@ -409,7 +384,6 @@
     color: var(--text-faint);
   }
 
-  /* specific accent stripes */
   .card:nth-child(1) { --accent: var(--c-actual); }
   .card:nth-child(2) { --accent: var(--c-forecast); }
   .card:nth-child(3) { --accent: var(--c-accent); }
@@ -417,9 +391,6 @@
   .card:nth-child(5) { --accent: var(--c-success); }
   .card:nth-child(6) { --accent: var(--c-warning); }
 
-  /* ═══════════════════════════
-     PIXEL-PERFECT TOOLTIP (NO CUTOFFS)
-     ═══════════════════════════ */
   [data-tip] {
     position: relative;
   }
@@ -472,7 +443,6 @@
     }
   }
 
-  /* Left-anchored for first card */
   [data-card-pos="first"]::after {
     left: 0;
     transform: translateY(4px);
@@ -494,7 +464,6 @@
     transform: translateY(0);
   }
 
-  /* Right-anchored for last card */
   [data-card-pos="last"]::after {
     right: 0;
     left: auto;
@@ -518,7 +487,6 @@
     transform: translateY(0);
   }
 
-  /* Centered for middle cards */
   [data-card-pos="mid"]::after {
     left: 50%;
     transform: translate(-50%, 4px);
@@ -540,7 +508,6 @@
     transform: translate(-50%, 0);
   }
 
-  /* Chart Tooltip */
   .tip {
     min-inline-size: 13rem;
     padding: var(--s-3);
@@ -562,7 +529,6 @@
   }
 }
 
-/* ---------- 6. CHART ---------- */
 @layer charts {
   .chart {
     padding: var(--s-4);
@@ -583,7 +549,6 @@
   .chart .recharts-tooltip-cursor { stroke: var(--c-accent); stroke-dasharray: 4 4; }
 }
 
-/* ---------- 7. STATES ---------- */
 @layer states {
   .msg {
     padding: var(--s-3) var(--s-4);
@@ -601,7 +566,6 @@
   }
 }
 
-/* ---------- 8. RESPONSIVE ---------- */
 @layer layout {
   @media (max-width: 44rem) {
     .wrap { inline-size: min(100% - 1.25rem, 1140px); }
@@ -617,7 +581,6 @@
   }
 }
 
-/* ---------- 9. UTILITIES & ACCESSIBILITY ---------- */
 @layer utilities {
   :focus-visible { outline: 3px solid var(--ring); outline-offset: 2px; border-radius: 4px; }
   @media (prefers-reduced-motion: reduce) {

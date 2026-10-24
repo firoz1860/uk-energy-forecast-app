@@ -1,12 +1,5 @@
-/* ==========================================================================
-   UK Wind Forecast Dashboard – EXTRAS
-   File: frontend/src/styles/extras.css
-   Import AFTER index.css (see main.jsx)
-   ========================================================================== */
-
 @layer extras;
 
-/* ---------- 0. @property: lets the browser animate custom properties ---------- */
 @property --angle {
   syntax: "<angle>";
   inherits: false;
@@ -14,63 +7,57 @@
 }
 
 @layer extras {
-
-  /* ======================================================================
-     1. MANUAL THEME OVERRIDE  (<html data-theme="light|dark">)
-        Beats the OS preference set in index.css
-     ====================================================================== */
   :root[data-theme="light"] {
     color-scheme: light;
-    --bg: #f0f2f8;
-    --bg-mesh-1: #dbe4ff;
-    --bg-mesh-2: #c5f6fa;
-    --bg-mesh-3: #fce4ec;
+    --bg: #f8fafc;
+    --bg-mesh-1: #e0e7ff;
+    --bg-mesh-2: #cffafe;
+    --bg-mesh-3: #fce7f3;
     --surface: #ffffff;
-    --surface-raised: #ffffff;
-    --surface-glass: rgb(255 255 255 / 0.6);
-    --surface-glass-heavy: rgb(255 255 255 / 0.82);
+    --surface-raised: #f1f5f9;
+    --surface-glass: rgb(255 255 255 / 0.85);
+    --surface-glass-heavy: rgb(255 255 255 / 0.95);
     --text: #0f172a;
     --text-muted: #475569;
-    --text-faint: #94a3b8;
-    --border: rgb(148 163 184 / 0.2);
-    --border-strong: rgb(148 163 184 / 0.35);
-    --grid: rgb(148 163 184 / 0.15);
+    --text-faint: #64748b;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --grid: #e2e8f0;
     --c-actual: #0b7285;
     --c-forecast: #e8590c;
-    --c-accent: #4c6ef5;
-    --shadow-1: 0 1px 2px rgb(0 0 0 / 0.04), 0 1px 3px rgb(0 0 0 / 0.06);
-    --shadow-2: 0 1px 2px rgb(0 0 0 / 0.03), 0 4px 8px -1px rgb(0 0 0 / 0.05), 0 12px 20px -4px rgb(0 0 0 / 0.08);
-    --shadow-3: 0 1px 3px rgb(0 0 0 / 0.04), 0 8px 16px -4px rgb(0 0 0 / 0.08), 0 24px 48px -12px rgb(0 0 0 / 0.15);
+    --c-accent: #3b82f6;
+    --shadow-1: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+    --shadow-2: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.07);
+    --shadow-3: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
+
   :root[data-theme="dark"] {
     color-scheme: dark;
-    --bg: #050a18;
-    --bg-mesh-1: #172554;
+    --bg: #0b1329;
+    --bg-mesh-1: #1e1b4b;
     --bg-mesh-2: #083344;
-    --bg-mesh-3: #3b0764;
-    --surface: #0c1425;
-    --surface-raised: #111b30;
-    --surface-glass: rgb(12 20 37 / 0.55);
-    --surface-glass-heavy: rgb(12 20 37 / 0.78);
-    --text: #e8ecf4;
+    --bg-mesh-3: #2e1065;
+    --surface: #111c38;
+    --surface-raised: #18274d;
+    --surface-glass: rgb(17 28 56 / 0.85);
+    --surface-glass-heavy: rgb(17 28 56 / 0.95);
+    --text: #f8fafc;
     --text-muted: #94a3b8;
     --text-faint: #64748b;
-    --border: rgb(148 163 184 / 0.1);
-    --border-strong: rgb(148 163 184 / 0.2);
-    --grid: rgb(148 163 184 / 0.06);
-    --c-actual: #22d3ee;
-    --c-forecast: #fb923c;
-    --c-accent: #818cf8;
-    --shadow-1: 0 1px 3px rgb(0 0 0 / 0.5);
-    --shadow-2: 0 4px 12px -2px rgb(0 0 0 / 0.5), 0 16px 32px -8px rgb(0 0 0 / 0.4);
-    --shadow-3: 0 8px 24px -6px rgb(0 0 0 / 0.6), 0 32px 64px -16px rgb(0 0 0 / 0.5);
+    --border: #1e294b;
+    --border-strong: #2d3b66;
+    --grid: #1e294b;
+    --c-actual: #06b6d4;
+    --c-forecast: #f97316;
+    --c-accent: #60a5fa;
+    --shadow-1: 0 1px 3px rgb(0 0 0 / 0.4);
+    --shadow-2: 0 4px 8px rgb(0 0 0 / 0.45);
+    --shadow-3: 0 12px 24px -4px rgb(0 0 0 / 0.6);
   }
 
-  /* calendar icon must match the forced theme, not the OS */
   :root[data-theme="light"] .selector input[type="date"]::-webkit-calendar-picker-indicator { filter: none; }
-  :root[data-theme="dark"]  .selector input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.85) hue-rotate(180deg); }
+  :root[data-theme="dark"]  .selector input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.9) hue-rotate(180deg); }
 
-  /* smooth colour change when toggling the theme */
   :root.theme-anim,
   :root.theme-anim *,
   :root.theme-anim *::before,
@@ -84,9 +71,6 @@
       box-shadow 400ms ease !important;
   }
 
-  /* ======================================================================
-     2. THEME TOGGLE BUTTON  (.theme-toggle)
-     ====================================================================== */
   .theme-toggle {
     position: fixed;
     inset-block-start: 1rem;
@@ -123,9 +107,6 @@
     outline-offset: 3px;
   }
 
-  /* ======================================================================
-     3. SCROLL PROGRESS BAR  (pure CSS, no JSX needed)
-     ====================================================================== */
   @supports (animation-timeline: scroll()) {
     body::before {
       content: "";
@@ -142,30 +123,6 @@
   }
   @keyframes grow-x { to { transform: scaleX(1); } }
 
-  /* ======================================================================
-     4. STICKY GLASS FILTER BAR  (enhances existing .selector)
-     ====================================================================== */
-  .selector {
-    position: sticky;
-    inset-block-start: 0.75rem;
-    z-index: 20;
-  }
-
-  /* gets stronger shadow once stuck (scroll-driven) */
-  @supports (animation-timeline: scroll()) {
-    .selector {
-      animation: stuck-shadow linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 0 140px;
-    }
-  }
-  @keyframes stuck-shadow {
-    to { box-shadow: var(--shadow-3); }
-  }
-
-  /* ======================================================================
-     5. QUICK-RANGE CHIPS  (.chip-group > .chip)
-     ====================================================================== */
   .chip-group {
     display: flex;
     flex-wrap: wrap;
@@ -174,31 +131,26 @@
   }
 
   .chip {
-    min-block-size: 40px;
-    padding: var(--s-2) var(--s-4);
+    min-block-size: 38px;
+    padding: 6px 14px;
     font-size: var(--fs-small);
     font-weight: 600;
     color: var(--text-muted);
     cursor: pointer;
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border);
     border-radius: var(--r-full);
-    background: var(--surface-glass);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    transition:
-      all 180ms var(--ease-out),
-      transform 180ms var(--ease-spring);
+    background: var(--surface);
+    transition: all 160ms var(--ease-out);
     white-space: nowrap;
   }
   .chip:hover {
     color: var(--text);
     border-color: var(--c-accent);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     box-shadow: var(--shadow-1);
   }
   .chip:active {
     transform: scale(0.96);
-    transition-duration: 60ms;
   }
   .chip:focus-visible {
     outline: 3px solid var(--ring);
@@ -209,26 +161,21 @@
     color: #fff;
     border-color: transparent;
     background: linear-gradient(135deg, var(--c-accent), var(--c-actual));
-    box-shadow:
-      0 4px 12px -4px color-mix(in srgb, var(--c-accent) 60%, transparent),
-      0 8px 20px -8px color-mix(in srgb, var(--c-actual) 40%, transparent);
+    box-shadow: 0 4px 12px -3px color-mix(in srgb, var(--c-accent) 50%, transparent);
   }
 
-  /* ======================================================================
-     6. STATUS BADGES  (.badge, .badge--over, .badge--under, .badge--ok)
-     ====================================================================== */
   .badge {
     display: inline-flex;
     align-items: center;
     gap: 0.4em;
-    padding: 0.2em 0.65em;
-    font-size: 0.7rem;
+    padding: 0.25em 0.65em;
+    font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
     border-radius: var(--r-full);
     color: var(--badge, var(--text-muted));
-    background: color-mix(in srgb, var(--badge, var(--text-muted)) 14%, transparent);
+    background: color-mix(in srgb, var(--badge, var(--text-muted)) 12%, transparent);
     border: 1px solid color-mix(in srgb, var(--badge, var(--text-muted)) 30%, transparent);
     line-height: 1;
     white-space: nowrap;
@@ -245,9 +192,6 @@
   .badge--under { --badge: var(--c-actual); }
   .badge--ok    { --badge: var(--c-success); }
 
-  /* ======================================================================
-     7. SKELETON LOADERS  (.skeleton, .skeleton-card, .skeleton-chart)
-     ====================================================================== */
   .skeleton {
     position: relative;
     overflow: hidden;
@@ -268,7 +212,7 @@
     animation: skeleton-shimmer 1.8s ease-in-out infinite;
   }
   .skeleton-card {
-    block-size: 108px;
+    block-size: 112px;
     border-radius: var(--r-md);
   }
   .skeleton-chart {
@@ -285,9 +229,6 @@
     100% { background-position: 200% 0; }
   }
 
-  /* ======================================================================
-     10. TOAST MESSAGES  (.toast, .toast--error, .toast--success)
-     ====================================================================== */
   .toast {
     position: fixed;
     inset-block-end: 1.25rem;
@@ -314,9 +255,6 @@
   @keyframes toast-in  { from { opacity: 0; transform: translateY(24px) scale(0.96); } }
   @keyframes toast-out { to   { opacity: 0; transform: translateY(12px); visibility: hidden; } }
 
-  /* ======================================================================
-     11. DENSITY MODE  (<html data-density="compact">)
-     ====================================================================== */
   :root[data-density="compact"] {
     --s-3: 0.5rem;
     --s-4: 0.75rem;
@@ -327,9 +265,6 @@
   }
   :root[data-density="compact"] .card-s { display: none; }
 
-  /* ======================================================================
-     12. FULLSCREEN / EXPANDED CHART
-     ====================================================================== */
   .chart[data-expanded="true"] {
     position: fixed;
     inset: 0.75rem;
@@ -355,18 +290,16 @@
   }
 
   .btn {
-    min-block-size: 40px;
-    padding: var(--s-2) var(--s-4);
+    min-block-size: 38px;
+    padding: 6px 14px;
     font-size: var(--fs-small);
     font-weight: 600;
     color: var(--text);
     cursor: pointer;
-    border: 1px solid var(--border-strong);
+    border: 1px solid var(--border);
     border-radius: var(--r-sm);
-    background: var(--surface-glass);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    transition: all 160ms var(--ease-out), transform 160ms var(--ease-spring);
+    background: var(--surface);
+    transition: all 160ms var(--ease-out);
   }
   .btn:hover {
     border-color: var(--c-accent);
@@ -375,7 +308,6 @@
   }
   .btn:active {
     transform: scale(0.97);
-    transition-duration: 60ms;
   }
   .btn:focus-visible {
     outline: 3px solid var(--ring);
@@ -393,9 +325,6 @@
     box-shadow: none;
   }
 
-  /* ======================================================================
-     13. DATA TABLE  (.table-wrap > table.data-table)
-     ====================================================================== */
   .table-wrap {
     overflow: auto;
     max-block-size: 420px;
@@ -426,36 +355,31 @@
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--text-muted);
-    background: var(--surface-glass-heavy);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border-block-end: 1px solid var(--border-strong);
+    background: var(--surface);
+    border-block-end: 1px solid var(--border);
   }
   .data-table tbody tr:nth-child(even) {
-    background: color-mix(in srgb, var(--text) 3%, transparent);
+    background: color-mix(in srgb, var(--text) 2.5%, transparent);
   }
   .data-table tbody tr {
     transition: background 120ms;
   }
   .data-table tbody tr:hover {
-    background: color-mix(in srgb, var(--c-accent) 10%, transparent);
+    background: color-mix(in srgb, var(--c-accent) 8%, transparent);
   }
-  .data-table .pos { color: var(--c-forecast); }
-  .data-table .neg { color: var(--c-actual); }
+  .data-table .pos { color: var(--c-forecast); font-weight: 600; }
+  .data-table .neg { color: var(--c-actual); font-weight: 600; }
   @media (max-width: 40rem) {
     .data-table th, .data-table td { padding: var(--s-2); font-size: 0.78rem; }
   }
 
-  /* ======================================================================
-     14. BACK-TO-TOP FLOATING BUTTON  (.fab)
-     ====================================================================== */
   .fab {
     position: fixed;
     inset-block-end: 1.25rem;
     inset-inline-end: 1.25rem;
     z-index: 40;
-    inline-size: 48px;
-    block-size: 48px;
+    inline-size: 44px;
+    block-size: 44px;
     display: grid;
     place-items: center;
     font-size: 1.2rem;
@@ -464,46 +388,21 @@
     border: none;
     border-radius: 50%;
     background: linear-gradient(135deg, var(--c-accent), var(--c-actual));
-    box-shadow: var(--shadow-3);
-    transition: transform 200ms var(--ease-spring), box-shadow 200ms;
+    box-shadow: var(--shadow-2);
+    transition: transform 180ms var(--ease-spring), box-shadow 180ms;
   }
   .fab:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: var(--shadow-3), 0 0 20px color-mix(in srgb, var(--c-accent) 40%, transparent);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-3);
   }
   .fab:active {
-    transform: scale(0.92);
-    transition-duration: 60ms;
+    transform: scale(0.94);
   }
   .fab:focus-visible {
     outline: 3px solid var(--ring);
     outline-offset: 3px;
   }
-  @supports (animation-timeline: scroll()) {
-    .fab {
-      opacity: 0;
-      animation: fab-in linear both;
-      animation-timeline: scroll(root block);
-      animation-range: 200px 400px;
-    }
-    @keyframes fab-in { to { opacity: 1; } }
-  }
 
-  /* ======================================================================
-     15. SCROLL-REVEAL for any block (add class .reveal)
-     ====================================================================== */
-  @supports (animation-timeline: view()) {
-    .reveal {
-      animation: reveal linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 40%;
-    }
-    @keyframes reveal { from { opacity: 0; transform: translateY(30px); } }
-  }
-
-  /* ======================================================================
-     16. PAGE FOOTER + LIVE STATUS DOT  (.footer, .live-dot)
-     ====================================================================== */
   .footer {
     margin-block-start: var(--s-5);
     padding-block: var(--s-4);
@@ -529,30 +428,15 @@
   }
 }
 
-/* ---------- View transitions (Chrome 111+, Safari 18+) ---------- */
-@supports (view-transition-name: none) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 400ms;
-  }
-}
-
-/* ---------- Reduced motion for extras ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .card::before,
   .live-dot,
   .skeleton::after,
   .toast,
   body::before {
     animation: none !important;
   }
-  .reveal, .fab, .selector {
-    animation: none !important;
-    opacity: 1 !important;
-  }
 }
 
-/* ---------- Print for extras ---------- */
 @media print {
   .theme-toggle,
   .fab,
@@ -565,4 +449,3 @@
   }
   .selector { position: static; }
 }
-

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DateSelector from "./components/DateSelector";
 import MetricCards from "./components/MetricCards";
 import WindChart from "./components/WindChart";
+import DataTable from "./components/DataTable";
 import { fetchWind } from "./services/api";
 
 const presets = [
@@ -85,13 +86,19 @@ export default function App() {
         ↑
       </button>
 
-      <div>
+      {/* Brand Header */}
+      <header className="brand-header">
+        <div className="brand-logo-badge">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
+          <span>UK Power Trading Analytics</span>
+        </div>
         <h1>UK Wind Forecast vs Actual – January 2026</h1>
         <p className="sub">
-          The forecast the trader actually had at day-ahead decision time, and how far
-          it was from reality.
+          Evaluating National Grid ESO wind forecasts available strictly at the Day-Ahead decision gate (09:00 UK time) against actual outturn generation.
         </p>
-      </div>
+      </header>
 
       {/* Controls Bar: Quick presets + Density button */}
       <div
@@ -134,7 +141,12 @@ export default function App() {
         onChange={(start, end) => setRange({ start, end })}
       />
 
-      {data && <p className="rule">Rule: {data.decision_rule}</p>}
+      {data && (
+        <div className="rule">
+          <span className="live-dot" style={{ margin: 0 }} />
+          <span><b>Trading Cutoff:</b> {data.decision_rule}</span>
+        </div>
+      )}
 
       {/* Error state */}
       {error && <p className="msg err">Error: {error}</p>}
@@ -151,17 +163,18 @@ export default function App() {
         </>
       )}
 
-      {/* Data Visualizations */}
+      {/* Data Visualizations & Table */}
       {data && !loading && (
         <>
           <MetricCards metrics={data.metrics} />
           <WindChart points={data.points} />
+          <DataTable points={data.points} />
         </>
       )}
 
       <footer className="footer">
         <span className="live-dot" />
-        Data Source: Elexon BMRS API (<code>FUELHH</code> Actuals & <code>WINDFOR</code> Forecasts)
+        Data Source: Elexon BMRS API (<code>FUELHH</code> Actuals & <code>WINDFOR</code> Forecasts) · Target Period: January 2026
       </footer>
     </main>
   );

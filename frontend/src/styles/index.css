@@ -145,6 +145,43 @@
     gap: var(--s-4);
   }
 
+  /* Brand Header Badge */
+  .brand-header {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  .brand-logo-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--s-2);
+    width: fit-content;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--c-accent);
+    background: color-mix(in srgb, var(--c-accent) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--c-accent) 30%, transparent);
+    border-radius: var(--r-full);
+  }
+
+  /* Table Section Controls */
+  .table-section {
+    display: grid;
+    gap: var(--s-2);
+    margin-top: var(--s-2);
+  }
+
+  .table-header-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--s-2);
+  }
+
   .sub {
     max-inline-size: 65ch;
     color: var(--text-muted);

@@ -1,12 +1,12 @@
 import { fmtMW, fmtPct } from "../utils/formatters";
 
 const tip = {
-  MAE: "Average absolute miss between forecast and actual.",
-  RMSE: "Like MAE but punishes large misses more.",
-  Bias: "Average of forecast minus actual. Positive = over-forecast.",
-  "P95 abs error": "95% of half-hours miss by less than this.",
-  nMAE: "MAE divided by mean wind output.",
-  Samples: "Number of half-hour slots compared.",
+  MAE: "Average absolute miss between forecast and actual generation.",
+  RMSE: "Root Mean Square Error: penalises severe forecast misses more heavily.",
+  Bias: "Mean Error (Forecast − Actual). Positive indicates systematic over-forecasting.",
+  "P95 abs error": "95% of half-hour settlement periods miss by less than this buffer.",
+  nMAE: "Normalized MAE as a percentage of average actual wind generation.",
+  Samples: "Total number of half-hour settlement intervals evaluated.",
 };
 
 export default function MetricCards({ metrics }) {
@@ -33,27 +33,47 @@ export default function MetricCards({ metrics }) {
       "Half-hours compared",
     ],
   ];
+
   return (
     <div className="cards">
-      {cards.map(([t, v, s]) => (
-        <div className="card" key={t} data-tip={tip[t]} tabIndex={0}>
-          <div className="card-t">{t}</div>
-          <div className="card-v">{v}</div>
-          <div className="card-s">
-            {t === "Bias" && metrics.bias !== null && (
-              <span
-                className={`badge ${
-                  metrics.bias > 0 ? "badge--over" : "badge--under"
-                }`}
-                style={{ display: "inline-flex", marginBottom: "4px" }}
-              >
-                {metrics.bias > 0 ? "Over-forecast" : "Under-forecast"}
+      {cards.map(([t, v, s], idx) => {
+        const pos =
+          idx === 0
+            ? "first"
+            : idx === cards.length - 1
+            ? "last"
+            : "mid";
+        return (
+          <div
+            className="card"
+            key={t}
+            data-tip={tip[t]}
+            data-card-pos={pos}
+            tabIndex={0}
+          >
+            <div className="card-header-row">
+              <div className="card-t">{t}</div>
+              <span className="card-info-icon" title={tip[t]} aria-hidden="true">
+                ⓘ
               </span>
-            )}
-            <div>{s}</div>
+            </div>
+            <div className="card-v">{v}</div>
+            <div className="card-s">
+              {t === "Bias" && metrics.bias !== null && (
+                <span
+                  className={`badge ${
+                    metrics.bias > 0 ? "badge--over" : "badge--under"
+                  }`}
+                  style={{ display: "inline-flex", marginBottom: "4px" }}
+                >
+                  {metrics.bias > 0 ? "Over-forecast" : "Under-forecast"}
+                </span>
+              )}
+              <div className="card-desc">{s}</div>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

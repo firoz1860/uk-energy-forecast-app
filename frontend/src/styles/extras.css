@@ -246,67 +246,7 @@
   .badge--ok    { --badge: var(--c-success); }
 
   /* ======================================================================
-     7. METRIC TOOLTIPS  (any element with data-tip="...")
-     ====================================================================== */
-  [data-tip] {
-    position: relative;
-    cursor: help;
-  }
-  [data-tip]::after {
-    content: attr(data-tip);
-    position: absolute;
-    inset-block-end: calc(100% + 10px);
-    inset-inline-start: 50%;
-    z-index: 60;
-    inline-size: max-content;
-    max-inline-size: 18rem;
-    padding: var(--s-2) var(--s-3);
-    font-size: 0.78rem;
-    font-weight: 500;
-    letter-spacing: normal;
-    text-transform: none;
-    line-height: 1.45;
-    color: var(--text);
-    background: var(--surface-glass-heavy);
-    border: 1px solid var(--border-strong);
-    border-radius: var(--r-sm);
-    box-shadow: var(--shadow-3);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    opacity: 0;
-    pointer-events: none;
-    transform: translate(-50%, 6px);
-    transition: opacity 200ms, transform 200ms var(--ease-out);
-  }
-  [data-tip]:hover::after,
-  [data-tip]:focus-visible::after {
-    opacity: 1;
-    transform: translate(-50%, 0);
-  }
-  /* keep tooltip visible above card overflow */
-  .card[data-tip] { overflow: visible; }
-
-  /* ======================================================================
-     8. ANIMATED ROTATING BORDER on card hover  (uses @property --angle)
-     ====================================================================== */
-  .card::before {
-    background: conic-gradient(
-      from var(--angle),
-      var(--accent),
-      transparent 30%,
-      var(--c-forecast) 55%,
-      transparent 80%,
-      var(--accent)
-    );
-    animation: spin-border 6s linear infinite paused;
-  }
-  .card:hover::before {
-    animation-play-state: running;
-  }
-  @keyframes spin-border { to { --angle: 360deg; } }
-
-  /* ======================================================================
-     9. SKELETON LOADERS  (.skeleton, .skeleton-card, .skeleton-chart)
+     7. SKELETON LOADERS  (.skeleton, .skeleton-card, .skeleton-chart)
      ====================================================================== */
   .skeleton {
     position: relative;

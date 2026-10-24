@@ -7,26 +7,34 @@ export default function DateSelector({
 }) {
   return (
     <div className="selector">
-      <label>
-        From{" "}
-        <input
-          type="date"
-          value={start}
-          min={min}
-          max={end}
-          onChange={(e) => e.target.value && onChange(e.target.value, end)}
-        />
-      </label>
-      <label>
-        To{" "}
-        <input
-          type="date"
-          value={end}
-          min={start}
-          max={max}
-          onChange={(e) => e.target.value && onChange(start, e.target.value)}
-        />
-      </label>
+      <div className="selector-group">
+        <label className="selector-field">
+          <span className="selector-label-text">From</span>
+          <input
+            type="date"
+            value={start}
+            min={min}
+            max={end}
+            onChange={(e) => e.target.value && onChange(e.target.value, end)}
+          />
+        </label>
+        <span className="selector-separator" aria-hidden="true">
+          →
+        </span>
+        <label className="selector-field">
+          <span className="selector-label-text">To</span>
+          <input
+            type="date"
+            value={end}
+            min={start}
+            max={max}
+            onChange={(e) => e.target.value && onChange(start, e.target.value)}
+          />
+        </label>
+      </div>
+      <div className="selector-hint">
+        <span>Delivery period: January 2026</span>
+      </div>
     </div>
   );
 }

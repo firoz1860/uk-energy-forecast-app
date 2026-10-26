@@ -7,7 +7,6 @@ export default function DataTable({ points }) {
 
   if (!points || points.length === 0) return null;
 
-  // Filter for large forecast misses (> 2,500 MW)
   const displayPoints = filterMisses
     ? points.filter((p) => p.error !== null && Math.abs(p.error) >= 2500)
     : points;
@@ -27,7 +26,10 @@ export default function DataTable({ points }) {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "uk_wind_forecast_vs_actual_jan2026.csv");
+    const firstDay = points[0].startTime.slice(0, 10);
+    const lastDay = points[points.length - 1].startTime.slice(0, 10);
+    link.setAttribute("download", `uk_wind_forecast_vs_actual_${firstDay}_to_${lastDay}.csv`);
+
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

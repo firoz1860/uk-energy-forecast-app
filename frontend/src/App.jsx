@@ -5,23 +5,20 @@ import WindChart from "./components/WindChart";
 import DataTable from "./components/DataTable";
 import { fetchWind } from "./services/api";
 
-const presets = [
-  ["Week 1", "2026-01-01", "2026-01-07"],
-  ["Week 2", "2026-01-08", "2026-01-14"],
-  ["Week 3", "2026-01-15", "2026-01-21"],
-  ["Week 4", "2026-01-22", "2026-01-31"],
-  ["Full month", "2026-01-01", "2026-01-31"],
-];
+
+import { fmtRangeLabel, getDateBounds, monthPresets } from "./utils/formatters";
+
+const { min: MIN_DATE, max: MAX_DATE } = getDateBounds();
 
 export default function App() {
   const [range, setRange] = useState({ start: "2026-01-01", end: "2026-01-07" });
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const presets = monthPresets(range.start, MIN_DATE, MAX_DATE);
   const [theme, setTheme] = useState(() => localStorage.getItem("theme") || "");
   const [density, setDensity] = useState(() => localStorage.getItem("density") || "");
 
-  // Manage theme attribute
   useEffect(() => {
     const root = document.documentElement;
     if (theme) root.setAttribute("data-theme", theme);
@@ -29,7 +26,6 @@ export default function App() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  // Manage density attribute
   useEffect(() => {
     const root = document.documentElement;
     if (density) root.setAttribute("data-density", density);
@@ -59,8 +55,8 @@ export default function App() {
     fetchWind(range.start, range.end, controller.signal)
       .then((d) => live && setData(d))
       .catch((e) => {
-        if (!live || e.code === "ERR_CANCELED") return; // superseded by a newer request
-        setData(null); // never show stale results next to an error
+        if (!live || e.code === "ERR_CANCELED") return; 
+        setData(null); 
         setError(e.response?.data?.detail || e.message);
       })
       .finally(() => live && setLoading(false));
@@ -100,7 +96,9 @@ export default function App() {
           </svg>
           <span>UK Power Trading Analytics</span>
         </div>
-        <h1>UK Wind Forecast vs Actual – January 2026</h1>
+
+        <h1>UK Wind Forecast vs Actual – {fmtRangeLabel(range.start, range.end)}</h1>
+
         <p className="sub">
           Evaluating National Grid ESO wind forecasts available strictly at the Day-Ahead decision gate (09:00 UK time) against actual outturn generation.
         </p>
@@ -180,7 +178,7 @@ export default function App() {
 
       <footer className="footer">
         <span className="live-dot" />
-        Data Source: Elexon BMRS API (<code>FUELHH</code> Actuals & <code>WINDFOR</code> Forecasts) · Target Period: January 2026
+        Data Source: Elexon BMRS API (<code>FUELHH</code> Actuals & <code>WINDFOR</code> Forecasts) · Target Period: {fmtRangeLabel(range.start, range.end)}
       </footer>
     </main>
   );

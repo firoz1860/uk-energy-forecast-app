@@ -1,18 +1,39 @@
 import { useState, useRef, useEffect } from "react";
+import {
+  MONTH_NAMES,
+  addDays,
+  daysInMonth,
+  diffDays,
+  fmtFriendlyDate,
+  getDateBounds,
+  parseIso,
+  toIso,
+} from "../utils/formatters";
+
+const WEEKDAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+const DEFAULT_BOUNDS = getDateBounds();
 
 export default function DateSelector({
   start,
   end,
   onChange,
-  min = "2026-01-01",
-  max = "2026-01-31",
+  min = DEFAULT_BOUNDS.min,
+  max = DEFAULT_BOUNDS.max,
+  maxRangeDays = DEFAULT_BOUNDS.maxRangeDays,
 }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectingField, setSelectingField] = useState("start"); // "start" or "end"
+  const [selectingField, setSelectingField] = useState("start"); 
   const [hoverDate, setHoverDate] = useState(null);
+  const [notice, setNotice] = useState("");
+  const [view, setView] = useState(() => {
+    const { y, m0 } = parseIso(start);
+    return { y, m0 };
+  }); 
   const popoverRef = useRef(null);
 
-  // Close when clicking outside, or when pressing Escape
+  const minP = parseIso(min);
+  const maxP = parseIso(max);
+
   useEffect(() => {
     function handleClickOutside(e) {
       if (popoverRef.current && !popoverRef.current.contains(e.target)) {
@@ -32,54 +53,73 @@ export default function DateSelector({
     }
   }, [isOpen]);
 
-  // Clear hover preview whenever the popover closes
   useEffect(() => {
-    if (!isOpen) setHoverDate(null);
+    if (isOpen) {
+      const { y, m0 } = parseIso(selectingField === "end" ? end : start);
+      setView({ y, m0 });
+    } else {
+      setHoverDate(null);
+      setNotice("");
+    }
   }, [isOpen]);
 
-  // Format YYYY-MM-DD to human friendly "01 Jan 2026"
-  const formatFriendly = (iso) => {
-    if (!iso) return "–";
-    const [y, m, d] = iso.split("-");
-    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    return `${d} ${months[parseInt(m, 10) - 1]} ${y}`;
-  };
-
-  // Calculate day difference
   const getDaysCount = () => {
     if (!start || !end) return 0;
-    const d1 = new Date(start);
-    const d2 = new Date(end);
-    const diff = Math.round((d2 - d1) / (1000 * 60 * 60 * 24)) + 1;
+    const diff = diffDays(start, end) + 1;
     return diff > 0 ? diff : 1;
   };
 
-  const daysInJan = 31;
-  const paddingBefore = 3; // Dec 29, 30, 31 (Jan 1 2026 is a Thursday, grid starts on Monday)
-  const paddingAfter = (7 - ((paddingBefore + daysInJan) % 7)) % 7; // Feb 1 (fills last row)
+  const monthIndex = (y, m0) => y * 12 + m0;
+  const canGoPrev = monthIndex(view.y, view.m0) > monthIndex(minP.y, minP.m0);
+  const canGoNext = monthIndex(view.y, view.m0) < monthIndex(maxP.y, maxP.m0);
+  const shiftMonth = (delta) => {
+    const idx = monthIndex(view.y, view.m0) + delta;
+    setView({ y: Math.floor(idx / 12), m0: ((idx % 12) + 12) % 12 });
+  };
+  const clampView = (y, m0) => {
+    const idx = Math.min(Math.max(monthIndex(y, m0), monthIndex(minP.y, minP.m0)), monthIndex(maxP.y, maxP.m0));
+    setView({ y: Math.floor(idx / 12), m0: idx % 12 });
+  };
+  const years = Array.from({ length: maxP.y - minP.y + 1 }, (_, i) => minP.y + i);
 
-  const toIso = (day) => `2026-01-${day < 10 ? `0${day}` : `${day}`}`;
+  const daysInView = daysInMonth(view.y, view.m0);
+  const paddingBefore = (new Date(Date.UTC(view.y, view.m0, 1)).getUTCDay() + 6) % 7;
+  const paddingAfter = (7 - ((paddingBefore + daysInView) % 7)) % 7;
+  const prevMonthDays = daysInMonth(view.m0 === 0 ? view.y - 1 : view.y, (view.m0 + 11) % 12);
 
-  const handleDayClick = (dayNum) => {
-    const selectedIso = toIso(dayNum);
+  const limitRange = (s, e) => {
+    let end2 = e > max ? max : e;
+    if (diffDays(s, end2) + 1 > maxRangeDays) {
+      end2 = addDays(s, maxRangeDays - 1);
+      if (end2 > max) end2 = max;
+      setNotice(`Windows are limited to ${maxRangeDays} days, end date adjusted.`);
+    } else {
+      setNotice("");
+    }
+    return [s, end2];
+  };
+
+  const handleDayClick = (selectedIso) => {
     if (selectedIso < min || selectedIso > max) return;
 
     if (selectingField === "start") {
-      if (selectedIso > end) {
-        onChange(selectedIso, selectedIso);
-      } else {
-        onChange(selectedIso, end);
-      }
+      const [s, e] = limitRange(selectedIso, selectedIso > end ? selectedIso : end);
+      onChange(s, e);
       setSelectingField("end");
     } else {
-      if (selectedIso < start) {
-        // Clicked before the start date: swap, range is now complete
-        onChange(selectedIso, start);
-      } else {
-        onChange(start, selectedIso);
-      }
+      const [s, e] = selectedIso < start ? limitRange(selectedIso, start) : limitRange(start, selectedIso);
+      onChange(s, e);
       setSelectingField("start");
     }
+  };
+
+  const applyFullMonth = () => {
+    const first = toIso(view.y, view.m0, 1);
+    const last = toIso(view.y, view.m0, daysInView);
+    const [s, e] = limitRange(first < min ? min : first, last > max ? max : last);
+    onChange(s, e);
+    setSelectingField("start");
+    setIsOpen(false);
   };
 
   const openField = (field) => (e) => {
@@ -113,7 +153,7 @@ export default function DateSelector({
             onClick={openField("start")}
           >
             <span className="picker-label">FROM</span>
-            <span className="picker-value">{formatFriendly(start)}</span>
+            <span className="picker-value">{fmtFriendlyDate(start)}</span>
           </div>
 
           <span className="picker-arrow">→</span>
@@ -123,7 +163,7 @@ export default function DateSelector({
             onClick={openField("end")}
           >
             <span className="picker-label">TO</span>
-            <span className="picker-value">{formatFriendly(end)}</span>
+            <span className="picker-value">{fmtFriendlyDate(end)}</span>
           </div>
         </div>
 
@@ -148,9 +188,53 @@ export default function DateSelector({
       {/* Modern Calendar Popover (Linear/Vercel Design) */}
       {isOpen && (
         <div className="calendar-popover" role="dialog" aria-label="Select date range">
+          {/* Month / year navigation */}
+          <div className="calendar-nav">
+            <button
+              type="button"
+              className="cal-nav-btn"
+              aria-label="Previous month"
+              disabled={!canGoPrev}
+              onClick={() => shiftMonth(-1)}
+            >
+              ‹
+            </button>
+            <div className="cal-nav-selects">
+              <select
+                className="cal-select"
+                aria-label="Month"
+                value={view.m0}
+                onChange={(e) => clampView(view.y, Number(e.target.value))}
+              >
+                {MONTH_NAMES.map((name, i) => (
+                  <option key={name} value={i}>{name}</option>
+                ))}
+              </select>
+              <select
+                className="cal-select"
+                aria-label="Year"
+                value={view.y}
+                onChange={(e) => clampView(Number(e.target.value), view.m0)}
+              >
+                {years.map((y) => (
+                  <option key={y} value={y}>{y}</option>
+                ))}
+              </select>
+            </div>
+            <button
+              type="button"
+              className="cal-nav-btn"
+              aria-label="Next month"
+              disabled={!canGoNext}
+              onClick={() => shiftMonth(1)}
+            >
+              ›
+            </button>
+          </div>
+
           {/* Calendar Header */}
           <div className="calendar-header">
-            <span className="calendar-month-title">January 2026</span>
+            <span className="calendar-month-title">{MONTH_NAMES[view.m0]} {view.y}</span>
             <div className="calendar-selection-mode">
               <span className="mode-badge">
                 Clicking sets: <b>{selectingField === "start" ? "START DATE" : "END DATE"}</b>
@@ -160,35 +244,30 @@ export default function DateSelector({
 
           {/* Days of Week Header */}
           <div className="calendar-weekdays">
-            <span>Mo</span>
-            <span>Tu</span>
-            <span>We</span>
-            <span>Th</span>
-            <span>Fr</span>
-            <span>Sa</span>
-            <span>Su</span>
+            {WEEKDAYS.map((w) => (
+              <span key={w}>{w}</span>
+            ))}
           </div>
 
           {/* Days Grid */}
           <div className="calendar-grid">
-            {/* Dec padding days (29, 30, 31) */}
+            {/* Previous-month padding days */}
             {Array.from({ length: paddingBefore }).map((_, i) => (
-              <span key={`dec-${i}`} className="cal-day is-disabled">
-                {31 - paddingBefore + 1 + i}
+              <span key={`prev-${i}`} className="cal-day is-disabled">
+                {prevMonthDays - paddingBefore + 1 + i}
               </span>
             ))}
 
-            {/* January 1 - 31 */}
-            {Array.from({ length: daysInJan }).map((_, i) => {
+            {/* Days of the visible month */}
+            {Array.from({ length: daysInView }).map((_, i) => {
               const day = i + 1;
-              const dateIso = toIso(day);
+              const dateIso = toIso(view.y, view.m0, day);
 
               const isStart = dateIso === start;
               const isEnd = dateIso === end;
               const inRange = dateIso > start && dateIso < end;
               const isOutOfBounds = dateIso < min || dateIso > max;
 
-              // Live preview while choosing the end date: shade start -> hovered day
               const isPreview =
                 isOpen &&
                 selectingField === "end" &&
@@ -199,13 +278,13 @@ export default function DateSelector({
 
               return (
                 <button
-                  key={day}
+                  key={dateIso}
                   type="button"
                   disabled={isOutOfBounds}
                   aria-pressed={isStart || isEnd}
-                  aria-label={formatFriendly(dateIso)}
+                  aria-label={fmtFriendlyDate(dateIso)}
                   className={`cal-day ${isStart ? "is-start" : ""} ${isEnd ? "is-end" : ""} ${inRange ? "in-range" : ""} ${isPreview ? "is-preview" : ""} ${isOutOfBounds ? "is-disabled" : ""}`}
-                  onClick={() => handleDayClick(day)}
+                  onClick={() => handleDayClick(dateIso)}
                   onMouseEnter={() => setHoverDate(dateIso)}
                   onMouseLeave={() => setHoverDate(null)}
                   onFocus={() => setHoverDate(dateIso)}
@@ -216,13 +295,15 @@ export default function DateSelector({
               );
             })}
 
-            {/* Feb padding day(s) */}
+            {/* Next-month padding days */}
             {Array.from({ length: paddingAfter }).map((_, i) => (
-              <span key={`feb-${i}`} className="cal-day is-disabled">
+              <span key={`next-${i}`} className="cal-day is-disabled">
                 {i + 1}
               </span>
             ))}
           </div>
+
+          {notice && <div className="cal-notice" role="status">{notice}</div>}
 
           {/* Popover Footer with Quick Controls */}
           <div className="calendar-footer">
@@ -230,15 +311,7 @@ export default function DateSelector({
               <span>Delivery Market: GB Day-Ahead</span>
             </div>
             <div className="cal-footer-btns">
-              <button
-                type="button"
-                className="cal-btn-text"
-                onClick={() => {
-                  onChange("2026-01-01", "2026-01-31");
-                  setSelectingField("start");
-                  setIsOpen(false);
-                }}
-              >
+              <button type="button" className="cal-btn-text" onClick={applyFullMonth}>
                 Full Month
               </button>
               <button
@@ -255,3 +328,4 @@ export default function DateSelector({
     </div>
   );
 }
+

@@ -66,18 +66,23 @@ uk-energy-forecast-app/
 │   │   ├── elexon_client.py      # Elexon BMRS stream fetching (chunked, retries, caching)
 │   │   └── data_processor.py     # Pandas D-1 alignment, cutoff filtering, error metrics
 │   ├── tests/
-│   │   └── test_data_processor.py # Pytest unit tests verifying alignment logic
+│   │   ├── test_data_processor.py # Pytest unit tests verifying alignment logic & metrics
+│   │   ├── test_elexon_client.py  # Chunk-grid + cache-reuse tests (Elexon mocked)
+│   │   └── test_routes.py         # API tests: validation, null handling, 502 path
 │   ├── utils/
 │   │   └── constants.py          # Market timezones, cutoff hours, Elexon endpoints, CORS
+│   ├── .dockerignore             # Keeps .venv / caches out of the image
 │   ├── .env                      # Backend local environment config
 │   ├── Dockerfile                # Multi-stage/slim container configuration
 │   ├── main.py                   # FastAPI initialization with CORS middleware
 │   ├── pytest.ini                # Pytest configuration
-│   └── requirements.txt          # Python dependencies
+│   ├── requirements.txt          # Python runtime dependencies
+│   └── requirements-dev.txt      # + pytest, httpx (for running the tests)
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
-│   │   │   ├── DateSelector.jsx  # Interactive date range selector
+│   │   │   ├── DataTable.jsx     # Collapsible settlement breakdown table + CSV export
+│   │   │   ├── DateSelector.jsx  # Interactive calendar range picker (hover preview, keyboard)
 │   │   │   ├── MetricCards.jsx   # Quantitative KPI cards with tooltips & status badges
 │   │   │   └── WindChart.jsx     # Recharts time-series visualization with brush & fullscreen
 │   │   ├── services/
@@ -89,6 +94,9 @@ uk-energy-forecast-app/
 │   │   │   └── formatters.js     # Date/time, MW, and percentage formatting helpers
 │   │   ├── App.jsx               # Main React dashboard component
 │   │   └── main.jsx              # Application entry point
+│   ├── public/
+│   │   └── favicon.svg           # App icon
+│   ├── .dockerignore             # Keeps host node_modules out of the Linux image
 │   ├── .env                      # Frontend environment variables
 │   ├── Dockerfile                # Node 20 alpine container build
 │   ├── index.html                # HTML template
@@ -132,7 +140,7 @@ python -m venv .venv
 source .venv/bin/activate    # On Windows: .venv\Scripts\activate
 
 # Install dependencies
-pip install -r requirements.txt pytest
+pip install -r requirements-dev.txt
 
 # Run the API server
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload
@@ -157,12 +165,15 @@ npm run dev
 Run the backend unit test suite:
 ```bash
 cd backend
+pip install -r requirements-dev.txt
 pytest tests/
 ```
-All unit tests validate:
+The tests validate:
 1. Exact selection of the latest forecast before the D-1 09:00 UK cutoff.
 2. Complete rejection of intraday forecasts published on the day of delivery.
 3. Accurate computation of MAE, RMSE, Bias, and P95 error margins.
+4. Elexon fetching: non-WIND rows dropped, fixed 3-day chunk grid, and cache reuse across overlapping date windows.
+5. API behaviour: date validation (400), empty/missing data serialised as `null`, upstream failure mapped to 502.
 
 Verify the frontend production build:
 ```bash

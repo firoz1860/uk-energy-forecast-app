@@ -17,7 +17,9 @@ export default function MetricCards({ metrics }) {
     [
       "Bias",
       fmtMW(metrics.bias),
-      metrics.bias > 0
+      metrics.bias == null
+        ? "No overlapping data in this window"
+        : metrics.bias > 0
         ? "Over-forecasts wind (risk: under-buying)"
         : "Under-forecasts wind (risk: over-buying)",
     ],
@@ -29,7 +31,7 @@ export default function MetricCards({ metrics }) {
     ["nMAE", fmtPct(metrics.nmae_pct), "MAE as % of mean wind output"],
     [
       "Samples",
-      metrics.n_points.toLocaleString("en-GB"),
+      (metrics.n_points ?? 0).toLocaleString("en-GB"),
       "Half-hours compared",
     ],
   ];

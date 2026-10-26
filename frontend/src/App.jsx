@@ -42,7 +42,7 @@ export default function App() {
     root.classList.add("theme-anim");
     const isDark = theme
       ? theme === "dark"
-      : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      : window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ?? false;
     setTheme(isDark ? "light" : "dark");
     setTimeout(() => root.classList.remove("theme-anim"), 450);
   };
@@ -53,14 +53,20 @@ export default function App() {
 
   useEffect(() => {
     let live = true;
+    const controller = new AbortController();
     setLoading(true);
     setError(null);
-    fetchWind(range.start, range.end)
+    fetchWind(range.start, range.end, controller.signal)
       .then((d) => live && setData(d))
-      .catch((e) => live && setError(e.response?.data?.detail || e.message))
+      .catch((e) => {
+        if (!live || e.code === "ERR_CANCELED") return; // superseded by a newer request
+        setData(null); // never show stale results next to an error
+        setError(e.response?.data?.detail || e.message);
+      })
       .finally(() => live && setLoading(false));
     return () => {
       live = false;
+      controller.abort();
     };
   }, [range]);
 

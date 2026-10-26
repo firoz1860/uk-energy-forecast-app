@@ -31,41 +31,49 @@ def _get(url: str, params: dict, retries: int = 3) -> List[dict]:
     return []
 
 
+_GRID_ANCHOR = datetime(2025, 12, 29, tzinfo=timezone.utc)
+
+
 def _chunks(start: datetime, end: datetime):
-    cur = start
+    step = timedelta(days=CHUNK_DAYS)
+    cur = _GRID_ANCHOR + ((start - _GRID_ANCHOR) // step) * step
     while cur < end:
-        nxt = min(cur + timedelta(days=CHUNK_DAYS), end)
-        yield cur, nxt
-        cur = nxt
+        yield cur, cur + step
+        cur += step
 
 
 def fetch_wind_actuals(start: datetime, end: datetime) -> List[dict]:
-    """FUELHH, fuelType=WIND, targets in [start, end). Returns [{startTime, generation}]."""
-    key = ("act", start, end)
-    if key in _cache:
-        return _cache[key]
-    rows: List[dict] = []
+    """FUELHH, fuelType=WIND, covering targets in [start, end). Returns [{startTime, generation}].
+    May include a few extra half-hours around the window; the processor trims to the exact range."""
+    out: List[dict] = []
     for s, e in _chunks(start, end):
-        rows += _get(FUELHH_STREAM, {
-            "settlementDateFrom": s.strftime("%Y-%m-%d"),
-            "settlementDateTo": (e - timedelta(seconds=1)).strftime("%Y-%m-%d"),
-            "fuelType": "WIND",
-        })
-    out = [{"startTime": r["startTime"], "generation": r["generation"]}
-           for r in rows if r.get("fuelType", "WIND") == "WIND"]
-    _cache[key] = out
+        key = ("act", s, e)
+        if key not in _cache:
+            rows = _get(FUELHH_STREAM, {
+                "settlementDateFrom": s.strftime("%Y-%m-%d"),
+                "settlementDateTo": (e - timedelta(seconds=1)).strftime("%Y-%m-%d"),
+                "fuelType": "WIND",
+            })
+            mapped = [{"startTime": r["startTime"], "generation": r["generation"]}
+                      for r in rows if r.get("fuelType", "WIND") == "WIND"]
+            if not mapped:      # don't cache empty answers (could be a transient upstream gap)
+                continue
+            _cache[key] = mapped
+        out += _cache[key]
     return out
 
 
 def fetch_wind_forecasts(publish_from: datetime, publish_to: datetime) -> List[dict]:
     """WINDFOR published in [publish_from, publish_to). Returns [{startTime, publishTime, generation}]."""
-    key = ("fc", publish_from, publish_to)
-    if key in _cache:
-        return _cache[key]
-    rows: List[dict] = []
+    out: List[dict] = []
     for s, e in _chunks(publish_from, publish_to):
-        rows += _get(WINDFOR_STREAM, {"publishDateTimeFrom": _iso(s), "publishDateTimeTo": _iso(e)})
-    out = [{"startTime": r["startTime"], "publishTime": r["publishTime"], "generation": r["generation"]}
-           for r in rows]
-    _cache[key] = out
+        key = ("fc", s, e)
+        if key not in _cache:
+            rows = _get(WINDFOR_STREAM, {"publishDateTimeFrom": _iso(s), "publishDateTimeTo": _iso(e)})
+            mapped = [{"startTime": r["startTime"], "publishTime": r["publishTime"],
+                       "generation": r["generation"]} for r in rows]
+            if not mapped:
+                continue
+            _cache[key] = mapped
+        out += _cache[key]
     return out

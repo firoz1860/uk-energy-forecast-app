@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Brush,
   CartesianGrid,
@@ -30,6 +30,14 @@ function ChartTooltip({ active, payload, label }) {
 
 export default function WindChart({ points }) {
   const [expanded, setExpanded] = useState(false);
+
+  // Allow Escape to leave the expanded (fullscreen) view
+  useEffect(() => {
+    if (!expanded) return;
+    const onKey = (e) => e.key === "Escape" && setExpanded(false);
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [expanded]);
 
   return (
     <div className="chart" data-expanded={expanded}>
